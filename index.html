@@ -44,11 +44,19 @@
             border: none;
             cursor: pointer;
             outline: none;
-            font-size: 1.15rem; /* Slightly larger font */
-            padding: 1rem 2.5rem; /* Adjusted padding for a more prominent button */
+            font-size: 1.0rem; /* Slightly smaller default font for better mobile fit */
+            padding: 0.8rem 2.0rem; /* Adjusted padding for a more prominent button */
             letter-spacing: 0.05em; /* A bit of letter spacing */
             text-transform: uppercase; /* Uppercase for boldness */
         }
+        /* Make button larger on larger screens */
+        @media (min-width: 640px) { /* sm breakpoint */
+            .btn-primary {
+                font-size: 1.15rem;
+                padding: 1rem 2.5rem;
+            }
+        }
+
 
         .btn-primary:hover {
             background-position: right center; /* Change background position on hover */
@@ -69,8 +77,14 @@
 
 
         .product-card {
-            @apply bg-gray-800 bg-opacity-70 backdrop-filter backdrop-blur-sm p-6 rounded-xl shadow-xl flex flex-col items-center justify-between transition transform hover:scale-105 duration-300 ease-in-out;
+            @apply bg-gray-800 bg-opacity-70 backdrop-filter backdrop-blur-sm p-4 rounded-xl shadow-xl flex flex-col items-center justify-between transition transform hover:scale-105 duration-300 ease-in-out;
             border: 1px solid var(--color-border); /* Consistent border */
+        }
+        /* Adjust product card padding for larger screens */
+        @media (min-width: 640px) { /* sm breakpoint */
+            .product-card {
+                padding: 6; /* p-6 from tailwind */
+            }
         }
 
         .product-card:hover {
@@ -93,6 +107,8 @@
             z-index: 9999;
             transition: opacity 1s ease-out;
             color: white;
+            text-align: center; /* Ensure text is centered */
+            padding: 0 1rem; /* Add horizontal padding for smaller screens */
         }
 
         .loader {
@@ -123,11 +139,19 @@
             align-items: center;
             z-index: 9998;
             color: white;
-            font-size: 1.8rem;
+            font-size: 1.5rem; /* Smaller default font for mobile */
             font-weight: 600;
             text-align: center;
-            padding: 20px;
+            padding: 0 1rem; /* Add horizontal padding for smaller screens */
         }
+        /* Make font larger on larger screens */
+        @media (min-width: 640px) { /* sm breakpoint */
+            #payment-transition-overlay {
+                font-size: 1.8rem;
+                padding: 20px;
+            }
+        }
+
 
         /* Realtime Transaction Ticker */
         #transaction-ticker {
@@ -137,10 +161,10 @@
             transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
             color: var(--color-text-light);
-            padding: 10px 20px;
+            padding: 8px 15px; /* Slightly smaller padding for mobile */
             border-radius: 20px;
             z-index: 100;
-            font-size: 0.9rem;
+            font-size: 0.8rem; /* Smaller default font for mobile */
             white-space: nowrap;
             overflow: hidden;
             opacity: 0; /* Hidden initially, will fade in */
@@ -148,9 +172,18 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px; /* Smaller gap for mobile */
             animation: ticker-fade-in 0.5s forwards;
         }
+        /* Make font/padding larger on larger screens */
+        @media (min-width: 640px) { /* sm breakpoint */
+            #transaction-ticker {
+                font-size: 0.9rem;
+                padding: 10px 20px;
+                gap: 10px;
+            }
+        }
+
 
         #transaction-ticker .fa-shopping-cart {
             color: var(--color-secondary-blue);
@@ -185,7 +218,7 @@
 
         .custom-modal-content {
             background: var(--color-card-bg);
-            padding: 30px;
+            padding: 20px; /* Smaller default padding for mobile */
             border-radius: 12px;
             text-align: center;
             max-width: 400px;
@@ -195,25 +228,53 @@
             transform: translateY(-20px);
             transition: transform 0.3s ease-in-out;
         }
+        /* Make padding larger on larger screens */
+        @media (min-width: 640px) { /* sm breakpoint */
+            .custom-modal-content {
+                padding: 30px;
+            }
+        }
 
         .custom-modal.show .custom-modal-content {
             transform: translateY(0);
         }
 
         .custom-modal-content h3 {
-            font-size: 1.8rem;
+            font-size: 1.5rem; /* Smaller default font for mobile */
             color: white;
-            margin-bottom: 15px;
+            margin-bottom: 10px; /* Smaller default margin for mobile */
         }
+        /* Make font/margin larger on larger screens */
+        @media (min-width: 640px) { /* sm breakpoint */
+            .custom-modal-content h3 {
+                font-size: 1.8rem;
+                margin-bottom: 15px;
+            }
+        }
+
 
         .custom-modal-content p {
-            font-size: 1.1rem;
+            font-size: 0.9rem; /* Smaller default font for mobile */
             color: var(--color-text-light);
-            margin-bottom: 25px;
+            margin-bottom: 20px; /* Smaller default margin for mobile */
+        }
+        /* Make font/margin larger on larger screens */
+        @media (min-width: 640px) { /* sm breakpoint */
+            .custom-modal-content p {
+                font-size: 1.1rem;
+                margin-bottom: 25px;
+            }
         }
 
+
         .custom-modal-content button {
-            @apply btn-primary px-8 py-3;
+            @apply btn-primary px-6 py-2; /* Smaller default padding for mobile */
+        }
+        /* Make button padding larger on larger screens */
+        @media (min-width: 640px) { /* sm breakpoint */
+            .custom-modal-content button {
+                padding: 0.8rem 2.0rem;
+            }
         }
 
 
@@ -257,14 +318,14 @@
 
     <!-- Loading Screen -->
     <div id="loading-screen">
-        <h1 class="text-4xl sm:text-5xl font-extrabold mb-6 text-white tracking-widest">ARTA OTP ID</h1>
-        <div class="loader mb-8"></div>
-        <p class="text-lg sm:text-xl font-medium text-center px-4">BELI NOKOS MURAH DAN CEPAT HANYA DI ARTA OTP ID</p>
+        <h1 class="text-4xl sm:text-5xl font-extrabold mb-4 sm:mb-6 text-white tracking-widest">ARTA OTP ID</h1>
+        <div class="loader mb-6 sm:mb-8"></div>
+        <p class="text-base sm:text-xl font-medium text-center px-4">BELI NOKOS MURAH DAN CEPAT HANYA DI ARTA OTP ID</p>
     </div>
 
     <!-- Payment Transition Overlay -->
     <div id="payment-transition-overlay" class="text-center">
-        <div class="loader mb-8"></div>
+        <div class="loader mb-6 sm:mb-8"></div>
         <p class="text-xl sm:text-3xl font-semibold px-4">Sedang mengalihkan ke menu pembayaran, mohon tunggu...</p>
     </div>
 
@@ -287,23 +348,23 @@
                     <span class="text-secondary-blue mr-2">ARTA</span>OTP ID
                 </div>
                 <nav>
-                    <ul class="flex space-x-3 sm:space-x-6">
-                        <li><a href="#home" class="text-gray-300 hover:text-white transition duration-300 transform hover:scale-110 text-sm sm:text-base">Beranda</a></li>
-                        <li><a href="#products" class="text-gray-300 hover:text-white transition duration-300 transform hover:scale-110 text-sm sm:text-base">Produk</a></li>
-                        <li><a href="#how-to-buy" class="text-gray-300 hover:text-white transition duration-300 transform hover:scale-110 text-sm sm:text-base">Cara Beli</a></li>
-                        <li><a href="#reviews" class="text-gray-300 hover:text-white transition duration-300 transform hover:scale-110 text-sm sm:text-base">Ulasan</a></li>
+                    <ul class="flex space-x-2 sm:space-x-6">
+                        <li><a href="#home" class="text-gray-300 hover:text-white transition duration-300 transform hover:scale-110 text-xs sm:text-base">Beranda</a></li>
+                        <li><a href="#products" class="text-gray-300 hover:text-white transition duration-300 transform hover:scale-110 text-xs sm:text-base">Produk</a></li>
+                        <li><a href="#how-to-buy" class="text-gray-300 hover:text-white transition duration-300 transform hover:scale-110 text-xs sm:text-base">Cara Beli</a></li>
+                        <li><a href="#reviews" class="text-gray-300 hover:text-white transition duration-300 transform hover:scale-110 text-xs sm:text-base">Ulasan</a></li>
                     </ul>
                 </nav>
             </div>
         </header>
 
         <!-- Hero Section -->
-        <section id="home" class="relative h-screen flex items-center justify-center text-center p-6 pt-24 custom-gradient-bg">
-            <div class="z-10">
-                <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-4 sm:mb-6 leading-tight text-white animate-fade-in-up px-4">
+        <section id="home" class="relative h-screen flex items-center justify-center text-center p-6 custom-gradient-bg">
+            <div class="z-10 mt-16 sm:mt-24"> <!-- Adjusted margin-top to clear fixed header -->
+                <h1 class="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-4 sm:mb-6 leading-tight text-white animate-fade-in-up px-2 sm:px-4">
                     Dapatkan <span class="text-secondary-blue">NOKOS</span> Instan untuk Semua Kebutuhan Anda
                 </h1>
-                <p class="text-base sm:text-lg lg:text-xl text-gray-300 mb-6 md:mb-10 max-w-2xl mx-auto animate-fade-in-up delay-200 px-4">
+                <p class="text-base sm:text-lg lg:text-xl text-gray-300 mb-6 md:mb-10 max-w-2xl mx-auto animate-fade-in-up delay-200 px-2 sm:px-4">
                     Solusi terpercaya untuk aktivasi akun tanpa batas. Cepat, murah, dan aman.
                 </p>
                 <a href="#products" class="btn-primary animate-fade-in-up delay-400">Pesan Sekarang!</a>
@@ -365,7 +426,7 @@
                     </div>
                     <!-- New Product Card: TikTok -->
                     <div class="product-card">
-                        <i class="fab fa-tiktok text-4xl sm:text-5xl text-black bg-white rounded-full p-2 mb-4 sm:mb-6"></i>
+                        <i class="fab fa-tiktok text-4xl sm:text-5xl text-black bg-white rounded-full p-1 sm:p-2 mb-4 sm:mb-6"></i>
                         <h3 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-2 sm:mb-4 text-white">NOKOS TikTok</h3>
                         <p class="text-sm sm:text-base text-gray-300 mb-4 sm:mb-6">Khusus untuk verifikasi akun TikTok.</p>
                         <p class="text-3xl sm:text-4xl font-bold text-secondary-blue mb-6 sm:mb-8">4.5K</p>
@@ -496,7 +557,7 @@
         <div class="bg-gray-800 bg-opacity-70 backdrop-blur-sm p-6 sm:p-8 rounded-xl shadow-2xl max-w-sm w-full text-center border border-blue-700">
             <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-8 text-white">Selesaikan Pembayaran Anda</h2>
             <p class="text-sm sm:text-base lg:text-xl text-gray-300 mb-4 sm:mb-6">Scan QRIS di bawah ini untuk pembayaran:</p>
-            <div class="mb-6 sm:mb-8 p-3 sm:p-4 bg-white rounded-lg block mx-auto max-w-[200px] sm:max-w-[280px]">
+            <div class="mb-6 sm:mb-8 p-3 sm:p-4 bg-white rounded-lg block mx-auto w-full max-w-[200px] sm:max-w-[280px]"> <!-- Max width QRIS container adjusted -->
                 <!-- QRIS Image using the provided URL -->
                 <img src="https://s6.ezgif.com/tmp/ezgif-6a46ff9b10168.png" alt="[Gambar QRIS Pembayaran]" class="w-full h-auto rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/280x280/0A1931/FFFFFF?text=QRIS+TIDAK+MUAT';">
             </div>
