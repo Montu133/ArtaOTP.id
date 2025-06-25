@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTA OTP ID - Layanan Pembelian NOKOS Terpercaya</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome untuk ikon (misal: bintang rating) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Konfigurasi Tailwind untuk warna kustom dan font */
+        @tailwind base;
+        @tailwind components;
+        @tailwind utilities;
+
+        :root {
+            --color-primary-blue: #0A1931; /* Biru sangat gelap, hampir hitam */
+            --color-secondary-blue: #185ADB; /* Biru terang untuk aksen */
+            --color-text-light: #E0E0E0; /* Teks terang */
+            --color-bg-dark: #000000; /* Latar belakang hitam */
+            --color-card-bg: #1A1A1A; /* Latar belakang kartu gelap */
+            --color-border: #3A3A3A; /* Border abu-abu gelap */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-bg-dark);
+            color: var(--color-text-light);
+            overflow-x: hidden; /* Mencegah scroll horizontal */
+        }
+
+        .custom-gradient-bg {
+            background: linear-gradient(to bottom right, var(--color-primary-blue), var(--color-bg-dark));
+        }
+
+        /* Enhanced Button Style for .btn-primary */
+        .btn-primary {
+            @apply text-white font-bold rounded-lg transition duration-300 ease-in-out;
+            background-image: linear-gradient(to right, #185ADB 0%, #2A7FFF 51%, #185ADB 100%);
+            background-size: 200% auto;
+            box-shadow: 0 6px 20px rgba(24, 90, 219, 0.4); /* Stronger shadow with blue tint */
+            border: none;
+            cursor: pointer;
+            outline: none;
+            font-size: 1.15rem; /* Slightly larger font */
+            padding: 1rem 2.5rem; /* Adjusted padding for a more prominent button */
+            letter-spacing: 0.05em; /* A bit of letter spacing */
+            text-transform: uppercase; /* Uppercase for boldness */
+        }
+
+        .btn-primary:hover {
+            background-position: right center; /* Change background position on hover */
+            box-shadow: 0 8px 25px rgba(24, 90, 219, 0.7); /* Even stronger shadow on hover */
+            transform: translateY(-3px); /* Slight lift effect */
+        }
+
+        /* Specific style for red button on payment page */
+        .btn-primary.bg-red-600 {
+            background-image: linear-gradient(to right, #DC2626 0%, #EF4444 51%, #DC2626 100%);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+        }
+        .btn-primary.bg-red-600:hover {
+            background-position: right center;
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.7);
+            transform: translateY(-3px);
+        }
+
+
+        .product-card {
+            @apply bg-gray-800 bg-opacity-70 backdrop-filter backdrop-blur-sm p-6 rounded-xl shadow-xl flex flex-col items-center justify-between transition transform hover:scale-105 duration-300 ease-in-out;
+            border: 1px solid var(--color-border); /* Consistent border */
+        }
+
+        .product-card:hover {
+            border-color: var(--color-secondary-blue); /* Blue border on hover */
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5); /* Stronger shadow */
+        }
+
+        /* Loading Screen Styles */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom right, #0A1931, #000000); /* Biru dan hitam */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1s ease-out;
+            color: white;
+        }
+
+        .loader {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid var(--color-secondary-blue); /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Payment Transition Overlay */
+        #payment-transition-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Realtime Transaction Ticker */
+        #transaction-ticker {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
+            color: var(--color-text-light);
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 100;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            opacity: 0; /* Hidden initially, will fade in */
+            transition: opacity 0.5s ease-in-out;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: ticker-fade-in 0.5s forwards;
+        }
+
+        #transaction-ticker .fa-shopping-cart {
+            color: var(--color-secondary-blue);
+        }
+
+        @keyframes ticker-fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Custom Modal Styles */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+
+        .custom-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .custom-modal-content {
+            background: var(--color-card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--color-secondary-blue);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .custom-modal.show .custom-modal-content {
+            transform: translateY(0);
+        }
+
+        .custom-modal-content h3 {
+            font-size: 1.8rem;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .custom-modal-content p {
+            font-size: 1.1rem;
+            color: var(--color-text-light);
+            margin-bottom: 25px;
+        }
+
+        .custom-modal-content button {
+            @apply btn-primary px-8 py-3;
+        }
+
+
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--color-bg-dark);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-secondary-blue);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #104C91;
+        }
+
+        /* Text shadow for main headings */
+        h1.animate-fade-in-up {
+            text-shadow: 0 0 15px rgba(255,255,255,0.4), 0 0 25px rgba(24, 90, 219, 0.6);
+        }
+        h2 {
+            text-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        /* Enhance header shadow */
+        header {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4); /* Deeper shadow */
+        }
+
+        /* Enhance text input focus */
+        input[type="text"]:focus,
+        textarea:focus {
+            box-shadow: 0 0 0 3px rgba(24, 90, 219, 0.5); /* Blue glow on focus */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <h1 class="text-5xl font-extrabold mb-6 text-white tracking-widest">ARTA OTP ID</h1>
+        <div class="loader mb-8"></div>
+        <p class="text-xl font-medium">BELI NOKOS MURAH DAN CEPAT HANYA DI ARTA OTP ID</p>
+    </div>
+
+    <!-- Payment Transition Overlay -->
+    <div id="payment-transition-overlay" class="text-center">
+        <div class="loader mb-8"></div>
+        <p class="text-3xl font-semibold">Sedang mengalihkan ke menu pembayaran, mohon tunggu...</p>
+    </div>
+
+    <!-- Custom Modal for Messages -->
+    <div id="custom-message-modal" class="custom-modal">
+        <div class="custom-modal-content">
+            <h3 id="modal-title"></h3>
+            <p id="modal-message"></p>
+            <button onclick="hideModal()">Oke</button>
+        </div>
+    </div>
+
+
+    <!-- Main Home Page Content -->
+    <div id="home-page" class="min-h-screen custom-gradient-bg hidden">
+        <!-- Header -->
+        <header class="bg-gray-900 bg-opacity-70 p-6 shadow-lg backdrop-blur-sm fixed w-full z-50">
+            <div class="container mx-auto flex justify-between items-center">
+                <div class="text-3xl font-bold text-white flex items-center">
+                    <span class="text-secondary-blue mr-2">ARTA</span>OTP ID
+                </div>
+                <nav>
+                    <ul class="flex space-x-6">
+                        <li><a href="#home" class="text-gray-300 hover:text-white transition duration-300 transform hover:scale-110">Beranda</a></li>
+                        <li><a href="#products" class="text-gray-300 hover:text-white transition duration-300 transform hover:scale-110">Produk</a></li>
+                        <li><a href="#how-to-buy" class="text-gray-300 hover:text-white transition duration-300 transform hover:scale-110">Cara Beli</a></li>
+                        <li><a href="#reviews" class="text-gray-300 hover:text-white transition duration-300 transform hover:scale-110">Ulasan</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section id="home" class="relative h-screen flex items-center justify-center text-center p-6 pt-24 custom-gradient-bg">
+            <div class="z-10">
+                <h1 class="text-6xl font-extrabold mb-6 leading-tight text-white animate-fade-in-up">
+                    Dapatkan <span class="text-secondary-blue">NOKOS</span> Instan untuk Semua Kebutuhan Anda
+                </h1>
+                <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto animate-fade-in-up delay-200">
+                    Solusi terpercaya untuk aktivasi akun tanpa batas. Cepat, murah, dan aman.
+                </p>
+                <a href="#products" class="btn-primary animate-fade-in-up delay-400">Pesan Sekarang!</a>
+            </div>
+        </section>
+
+        <!-- Product Section -->
+        <section id="products" class="py-20 px-6 bg-gray-900 bg-opacity-70 backdrop-blur-md rounded-t-3xl -mt-16 relative z-20">
+            <div class="container mx-auto">
+                <h2 class="text-5xl font-bold text-center mb-16 text-white">Produk <span class="text-secondary-blue">NOKOS</span> Kami</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
+                    <!-- Product Card 1 -->
+                    <div class="product-card">
+                        <i class="fas fa-mobile-alt text-5xl text-blue-400 mb-6"></i>
+                        <h3 class="text-3xl font-semibold mb-4 text-white">NOKOS Semua Aplikasi</h3>
+                        <p class="text-gray-300 text-lg mb-6">Cocok untuk berbagai pendaftaran akun aplikasi apa pun.</p>
+                        <p class="text-4xl font-bold text-secondary-blue mb-8">3K – 20K</p>
+                        <button class="btn-primary buy-btn" data-product="NOKOS Semua Aplikasi">BAYAR</button>
+                    </div>
+                    <!-- Product Card 2 -->
+                    <div class="product-card">
+                        <i class="fab fa-whatsapp text-5xl text-green-500 mb-6"></i>
+                        <h3 class="text-3xl font-semibold mb-4 text-white">NOKOS WhatsApp</h3>
+                        <p class="text-gray-300 text-lg mb-6">Spesial untuk verifikasi akun WhatsApp Anda.</p>
+                        <p class="text-4xl font-bold text-secondary-blue mb-8">5K</p>
+                        <button class="btn-primary buy-btn" data-product="NOKOS WhatsApp">BAYAR</button>
+                    </div>
+                    <!-- Product Card 3 -->
+                    <div class="product-card">
+                        <i class="fab fa-telegram-plane text-5xl text-blue-500 mb-6"></i>
+                        <h3 class="text-3xl font-semibold mb-4 text-white">NOKOS Telegram</h3>
+                        <p class="text-gray-300 text-lg mb-6">Nomor khusus untuk pendaftaran Telegram.</p>
+                        <p class="text-4xl font-bold text-secondary-blue mb-8">3.5K</p>
+                        <button class="btn-primary buy-btn" data-product="NOKOS Telegram">BAYAR</button>
+                    </div>
+                    <!-- New Product Card: Instagram -->
+                    <div class="product-card">
+                        <i class="fab fa-instagram text-5xl text-pink-500 mb-6"></i>
+                        <h3 class="text-3xl font-semibold mb-4 text-white">NOKOS Instagram</h3>
+                        <p class="text-gray-300 text-lg mb-6">Aktivasi akun Instagram tanpa nomor pribadi.</p>
+                        <p class="text-4xl font-bold text-secondary-blue mb-8">4K</p>
+                        <button class="btn-primary buy-btn" data-product="NOKOS Instagram">BAYAR</button>
+                    </div>
+                    <!-- New Product Card: Facebook -->
+                    <div class="product-card">
+                        <i class="fab fa-facebook text-5xl text-blue-600 mb-6"></i>
+                        <h3 class="text-3xl font-semibold mb-4 text-white">NOKOS Facebook</h3>
+                        <p class="text-gray-300 text-lg mb-6">Untuk pendaftaran atau verifikasi akun Facebook.</p>
+                        <p class="text-4xl font-bold text-secondary-blue mb-8">3K</p>
+                        <button class="btn-primary buy-btn" data-product="NOKOS Facebook">BAYAR</button>
+                    </div>
+                    <!-- New Product Card: Google -->
+                    <div class="product-card">
+                        <i class="fab fa-google text-5xl text-red-500 mb-6"></i>
+                        <h3 class="text-3xl font-semibold mb-4 text-white">NOKOS Google</h3>
+                        <p class="text-gray-300 text-lg mb-6">Untuk aktivasi akun Google/Gmail.</p>
+                        <p class="text-4xl font-bold text-secondary-blue mb-8">6K</p>
+                        <button class="btn-primary buy-btn" data-product="NOKOS Google">BAYAR</button>
+                    </div>
+                    <!-- New Product Card: TikTok -->
+                    <div class="product-card">
+                        <i class="fab fa-tiktok text-5xl text-black bg-white rounded-full p-2 mb-6"></i>
+                        <h3 class="text-3xl font-semibold mb-4 text-white">NOKOS TikTok</h3>
+                        <p class="text-gray-300 text-lg mb-6">Khusus untuk verifikasi akun TikTok.</p>
+                        <p class="text-4xl font-bold text-secondary-blue mb-8">4.5K</p>
+                        <button class="btn-primary buy-btn" data-product="NOKOS TikTok">BAYAR</button>
+                    </div>
+                    <!-- New Product Card: Gojek/Grab -->
+                    <div class="product-card">
+                        <i class="fas fa-motorcycle text-5xl text-green-400 mb-6"></i>
+                        <h3 class="text-3xl font-semibold mb-4 text-white">NOKOS Transportasi Online</h3>
+                        <p class="text-gray-300 text-lg mb-6">Gojek, Grab, dan aplikasi transportasi lainnya.</p>
+                        <p class="text-4xl font-bold text-secondary-blue mb-8">7K</p>
+                        <button class="btn-primary buy-btn" data-product="NOKOS Transportasi Online">BAYAR</button>
+                    </div>
+                    <!-- New Product Card: Dating Apps -->
+                    <div class="product-card">
+                        <i class="fas fa-heart text-5xl text-red-400 mb-6"></i>
+                        <h3 class="text-3xl font-semibold mb-4 text-white">NOKOS Dating Apps</h3>
+                        <p class="text-gray-300 text-lg mb-6">Tinder, Bumble, dan aplikasi kencan lainnya.</p>
+                        <p class="text-4xl font-bold text-secondary-blue mb-8">8K</p>
+                        <button class="btn-primary buy-btn" data-product="NOKOS Dating Apps">BAYAR</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How To Buy Section -->
+        <section id="how-to-buy" class="py-20 px-6 bg-black">
+            <div class="container mx-auto text-center">
+                <h2 class="text-5xl font-bold text-center mb-16 text-white">Bagaimana <span class="text-secondary-blue">Cara Beli</span>?</h2>
+                <ol class="list-none space-y-8 max-w-3xl mx-auto">
+                    <li class="flex items-start text-left bg-gray-800 bg-opacity-70 backdrop-blur-sm p-6 rounded-lg shadow-md border border-gray-700">
+                        <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-secondary-blue rounded-full text-white font-bold text-2xl mr-6">1</div>
+                        <p class="text-xl text-gray-200">Pilih jenis NOKOS yang ingin dibeli dari daftar produk kami.</p>
+                    </li>
+                    <li class="flex items-start text-left bg-gray-800 bg-opacity-70 backdrop-blur-sm p-6 rounded-lg shadow-md border border-gray-700">
+                        <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-secondary-blue rounded-full text-white font-bold text-2xl mr-6">2</div>
+                        <p class="text-xl text-gray-200">Klik tombol "BAYAR" pada produk yang Anda inginkan.</p>
+                    </li>
+                    <li class="flex items-start text-left bg-gray-800 bg-opacity-70 backdrop-blur-sm p-6 rounded-lg shadow-md border border-gray-700">
+                        <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-secondary-blue rounded-full text-white font-bold text-2xl mr-6">3</div>
+                        <p class="text-xl text-gray-200">Tunggu 5 detik untuk pengalihan, lalu isi data kontak Anda (WhatsApp/Email/Telegram).</p>
+                    </li>
+                    <li class="flex items-start text-left bg-gray-800 bg-opacity-70 backdrop-blur-sm p-6 rounded-lg shadow-md border border-gray-700">
+                        <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-secondary-blue rounded-full text-white font-bold text-2xl mr-6">4</div>
+                        <p class="text-xl text-gray-200">Scan QRIS yang tersedia dan transfer sesuai dengan harga NOKOS yang Anda pilih.</p>
+                    </li>
+                    <li class="flex items-start text-left bg-gray-800 bg-opacity-70 backdrop-blur-sm p-6 rounded-lg shadow-md border border-gray-700">
+                        <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-secondary-blue rounded-full text-white font-bold text-2xl mr-6">5</div>
+                        <p class="text-xl text-gray-200">Tunggu beberapa saat, NOKOS akan segera dikirimkan ke kontak Anda!</p>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Customer Reviews Section -->
+        <section id="reviews" class="py-20 px-6 bg-black">
+            <div class="container mx-auto">
+                <h2 class="text-5xl font-bold text-center mb-16 text-white">Apa Kata <span class="text-secondary-blue">Pelanggan Kami</span>?</h2>
+
+                <!-- Dummy Testimonials -->
+                <div id="testimonial-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                    <!-- Testimonials will be dynamically inserted here by JS -->
+                </div>
+
+                <!-- Add Review Form -->
+                <div class="bg-gray-800 bg-opacity-70 backdrop-blur-sm p-8 rounded-xl shadow-2xl max-w-2xl mx-auto border border-blue-700">
+                    <h3 class="text-3xl font-semibold mb-6 text-white text-center">Berikan Ulasan Anda</h3>
+                    <form id="review-form" class="space-y-4">
+                        <div>
+                            <label for="reviewer-name" class="block text-gray-300 text-sm font-bold mb-2">Nama Anda:</label>
+                            <input type="text" id="reviewer-name" class="shadow appearance-none border border-gray-700 rounded-lg w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:ring-2 focus:ring-secondary-blue bg-gray-200" placeholder="Nama Anda" required>
+                        </div>
+                        <div>
+                            <label for="rating" class="block text-gray-300 text-sm font-bold mb-2">Rating Anda:</label>
+                            <div class="flex space-x-1">
+                                <!-- Star rating input -->
+                                <input type="radio" id="rating-5" name="rating" value="5" class="hidden" required>
+                                <label for="rating-5" class="text-gray-400 hover:text-yellow-400 cursor-pointer text-3xl">
+                                    <i class="fas fa-star"></i>
+                                </label>
+                                <input type="radio" id="rating-4" name="rating" value="4" class="hidden">
+                                <label for="rating-4" class="text-gray-400 hover:text-yellow-400 cursor-pointer text-3xl">
+                                    <i class="fas fa-star"></i>
+                                </label>
+                                <input type="radio" id="rating-3" name="rating" value="3" class="hidden">
+                                <label for="rating-3" class="text-gray-400 hover:text-yellow-400 cursor-pointer text-3xl">
+                                    <i class="fas fa-star"></i>
+                                </label>
+                                <input type="radio" id="rating-2" name="rating" value="2" class="hidden">
+                                <label for="rating-2" class="text-gray-400 hover:text-yellow-400 cursor-pointer text-3xl">
+                                    <i class="fas fa-star"></i>
+                                </label>
+                                <input type="radio" id="rating-1" name="rating" value="1" class="hidden">
+                                <label for="rating-1" class="text-gray-400 hover:text-yellow-400 cursor-pointer text-3xl">
+                                    <i class="fas fa-star"></i>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="review-comment" class="block text-gray-300 text-sm font-bold mb-2">Komentar Anda:</label>
+                            <textarea id="review-comment" rows="4" class="shadow appearance-none border border-gray-700 rounded-lg w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:ring-2 focus:ring-secondary-blue bg-gray-200" placeholder="Tulis komentar Anda di sini..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary w-full py-3">Kirim Ulasan</button>
+                    </form>
+                    <div id="review-message" class="mt-4 text-center text-green-400 font-semibold hidden">Terima kasih atas ulasan Anda!</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-gray-900 bg-opacity-70 p-6 text-center text-gray-400 backdrop-blur-sm">
+            <div class="container mx-auto">
+                <p>&copy; 2025 ARTA OTP ID. All rights reserved.</p>
+                <p>Designed with <span class="text-red-500">&hearts;</span> for your convenience.</p>
+            </div>
+        </footer>
+
+        <!-- Fake Realtime Transaction Ticker -->
+        <div id="transaction-ticker" class="flex items-center">
+            <i class="fas fa-shopping-cart text-blue-400 mr-2"></i>
+            <span id="ticker-text"></span>
+        </div>
+
+    </div> <!-- End of home-page -->
+
+    <!-- Payment Page (separate section, initially hidden) -->
+    <section id="payment-page" class="hidden min-h-screen flex flex-col items-center justify-center p-6 bg-gray-950 text-white">
+        <div class="bg-gray-800 bg-opacity-70 backdrop-blur-sm p-8 rounded-xl shadow-2xl max-w-lg w-full text-center border border-blue-700">
+            <h2 class="text-4xl font-bold mb-8 text-white">Selesaikan Pembayaran Anda</h2>
+            <p class="text-xl text-gray-300 mb-6">Scan QRIS di bawah ini untuk pembayaran:</p>
+            <div class="mb-8 p-4 bg-white rounded-lg inline-block">
+                <!-- QRIS Image using the provided URL -->
+                <img src="https://s6.ezgif.com/tmp/ezgif-6a46ff9b10168.png" alt="[Gambar QRIS Pembayaran]" class="w-72 h-72 mx-auto rounded-lg">
+            </div>
+            <p class="text-lg text-gray-300 mb-6">Setelah pembayaran, isi data kontak Anda untuk pengiriman NOKOS.</p>
+
+            <div class="mb-6 text-left">
+                <label for="contact-input" class="block text-gray-300 text-sm font-bold mb-2">
+                    Nomor WhatsApp,Email atau usn telegram anda Anda:
+                </label>
+                <input type="text" id="contact-input" class="shadow appearance-none border border-gray-700 rounded-lg w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:ring-2 focus:ring-secondary-blue bg-gray-200" placeholder="Contoh: 081234567890 atau email@contoh.com">
+            </div>
+
+            <div class="mb-8 text-left">
+                <label class="inline-flex items-center">
+                    <input type="checkbox" id="telegram-option" class="form-checkbox h-5 w-5 text-secondary-blue rounded-md focus:ring-secondary-blue bg-gray-700 border-gray-600">
+                    <span class="ml-2 text-gray-300 text-base">Saya tidak memiliki WhatsApp/Email, kirim ke Telegram saya.</span>
+                </label>
+            </div>
+
+            <button class="btn-primary w-full py-4 text-xl" onclick="confirmPayment()">KONFIRMASI PEMBAYARAN</button>
+            <button class="btn-primary mt-4 w-full bg-red-600 hover:bg-red-700" onclick="hidePaymentPage()">KEMBALI KE BERANDA</button>
+        </div>
+    </section>
+
+
+    <script>
+        // Data Dummy untuk Testimoni
+        const dummyTestimonials = [
+            { name: "Budi S.", rating: 5, comment: "Pelayanan cepat, NOKOS langsung masuk! Sangat direkomendasikan." },
+            { name: "Siti A.", rating: 4.5, comment: "Murah dan terpercaya. Sukses terus ARTA OTP ID!" },
+            { name: "Andi R.", rating: 5, comment: "Prosesnya mudah dan cepat, cocok buat yang butuh NOKOS instan." },
+            { name: "Dewi P.", rating: 4, comment: "Harga bersaing, cuma kadang pengiriman agak lama sedikit tapi tetap terkirim." },
+            { name: "Rina K.", rating: 5, comment: "Baru pertama kali coba, langsung puas. NOKOS valid dan bisa dipakai." },
+            { name: "Fajar G.", rating: 4.5, comment: "Admin responsif, top banget!" },
+            { name: "Maya L.", rating: 5, comment: "Luar biasa! Tidak ada kendala sama sekali." },
+            { name: "Bayu D.", rating: 4, comment: "Lumayan, bisa buat daftar akun lain." },
+            { name: "Cici M.", rating: 5, comment: "Paling cepat dibanding toko lain." },
+            { name: "Deni Z.", rating: 4.5, comment: "Good job! Terus tingkatkan kualitasnya." },
+            { name: "Eko W.", rating: 5, comment: "Puas dengan layanan Arta OTP ID." },
+            { name: "Fitri Y.", rating: 4, comment: "Semoga terus ada promo!" },
+            { name: "Gita O.", rating: 5, comment: "Sangat membantu untuk kebutuhan bisnis online saya." },
+            { name: "Heri Q.", rating: 4.5, comment: "Recomended seller!" },
+            { name: "Iwan N.", rating: 5, comment: "The best NOKOS provider!" },
+            { name: "Joko B.", rating: 4, comment: "OK lah, sesuai deskripsi." },
+            { name: "Kiki J.", rating: 5, comment: "Pelayanan 24 jam, mantap!" },
+            { name: "Lia H.", rating: 4.5, comment: "Selalu jadi pilihan pertama saya." },
+            { name: "Maman V.", rating: 5, comment: "Ga pernah kecewa sama ARTA OTP ID." },
+            { name: "Nana X.", rating: 4, "comment": "Aplikasi lancar, harga bersahabat." },
+            { name: "Oscar C.", rating: 5, comment: "Terima kasih banyak!" },
+            { name: "Putri S.", rating: 4.5, comment: "Cepat dan efisien." },
+            { name: "Raka D.", rating: 5, comment: "Sukses selalu ARTA OTP ID!" },
+            { name: "Santi L.", rating: 4, comment: "Lumayan lah, sesuai harga." },
+            { name: "Tono M.", rating: 5, comment: "Ini yang saya cari!" },
+            { name: "Uli P.", rating: 4.5, comment: "Sangat direkomendasikan untuk semua." },
+            { name: "Vina R.", rating: 5, comment: "Bintang 5 untuk pelayanan ini!" },
+            { name: "Wawan B.", rating: 4, comment: "Oke banget." },
+            { name: "Xena K.", rating: 5, comment: "Terbaik di kelasnya!" },
+            { name: "Yudi G.", rating: 4.5, comment: "Pasti langganan lagi." }
+        ];
+
+        // Data Dummy untuk Animasi Transaksi Nyata Palsu
+        const dummyTransactions = [
+            { name: "Siti", product: "NOKOS WA 1x" },
+            { name: "Budi", product: "NOKOS Telegram 2x" },
+            { name: "Rina", product: "NOKOS Semua Aplikasi 1x" },
+            { name: "Andi", product: "NOKOS WA 1x" },
+            { name: "Dewi", product: "NOKOS Telegram 1x" },
+            { name: "Fajar", product: "NOKOS Semua Aplikasi 2x" },
+            { name: "Maya", product: "NOKOS WA 1x" },
+            { name: "Bayu", product: "NOKOS Telegram 1x" },
+            { name: "Cici", product: "NOKOS Semua Aplikasi 1x" },
+            { name: "Deni", product: "NOKOS WA 2x" },
+            { name: "Eko", product: "NOKOS Telegram 1x" },
+            { name: "Fitri", product: "NOKOS Semua Aplikasi 1x" },
+            { name: "Gita", product: "NOKOS WA 1x" },
+            { name: "Heri", product: "NOKOS Telegram 2x" },
+            { name: "Iwan", product: "NOKOS Semua Aplikasi 1x" },
+            { name: "Joko", product: "NOKOS WA 1x" },
+            { name: "Kiki", product: "NOKOS Telegram 1x" },
+            { name: "Lia", product: "NOKOS Semua Aplikasi 2x" },
+            { name: "Maman", product: "NOKOS WA 1x" },
+            { name: "Nana", product: "NOKOS Telegram 1x" },
+            { name: "Oscar", product: "NOKOS Semua Aplikasi 1x" },
+            { name: "Putri", product: "NOKOS WA 2x" },
+            { name: "Raka", product: "NOKOS Telegram 1x" },
+            { name: "Santi", product: "NOKOS Semua Aplikasi 1x" },
+            { name: "Tono", product: "NOKOS WA 1x" },
+            { name: "Uli", product: "NOKOS Telegram 2x" },
+            { name: "Vina", product: "NOKOS Semua Aplikasi 1x" },
+            { name: "Wawan", product: "NOKOS WA 1x" },
+            { name: "Xena", product: "NOKOS Telegram 1x" },
+            { name: "Yudi", product: "NOKOS Semua Aplikasi 2x" },
+            { name: "Zaki", product: "NOKOS WA 1x" },
+            { name: "Aldo", product: "NOKOS Telegram 1x" },
+            { name: "Bella", product: "NOKOS Semua Aplikasi 1x" },
+            { name: "Citra", product: "NOKOS WA 2x" },
+            { name: "Dika", product: "NOKOS Telegram 1x" },
+            { name: "Elsa", product: "NOKOS Semua Aplikasi 1x" },
+            { name: "Gani", product: "NOKOS WA 1x" },
+            { name: "Hana", product: "NOKOS Telegram 2x" },
+            { name: "Indra", product: "NOKOS Semua Aplikasi 1x" },
+            { name: "Julia", product: "NOKOS WA 1x" }
+        ];
+
+        // --- DOM Elements ---
+        const loadingScreen = document.getElementById('loading-screen');
+        const homePage = document.getElementById('home-page');
+        const paymentTransitionOverlay = document.getElementById('payment-transition-overlay');
+        const paymentPage = document.getElementById('payment-page');
+        const customMessageModal = document.getElementById('custom-message-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+
+        // --- Custom Modal Functions ---
+        function showModal(title, message) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            customMessageModal.classList.add('show');
+        }
+
+        function hideModal() {
+            customMessageModal.classList.remove('show');
+        }
+
+        // --- Loading Screen Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0'; // Fade out
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none'; // Hide after fade
+                    homePage.classList.remove('hidden'); // Show main content (home page)
+                    homePage.classList.add('animate-fade-in'); // Add fade-in animation
+                    startFakeTransactionTicker(); // Start transaction ticker after main content loads
+                }, 1000); // Wait for 1 second transition
+            }, 2000); // Display loading screen for 2 seconds
+        });
+
+        // --- Product Purchase Logic ---
+        document.querySelectorAll('.buy-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const productName = button.dataset.product; // Not used yet, but good for future expansion
+
+                // Hide home page and show transition overlay
+                homePage.classList.add('hidden');
+                paymentTransitionOverlay.style.display = 'flex';
+
+                // After 5 seconds, hide transition overlay and show payment page
+                setTimeout(() => {
+                    paymentTransitionOverlay.style.display = 'none';
+                    paymentPage.classList.remove('hidden'); // Show payment page
+                    // No need to scroll here, as it's full screen and hidden elements don't scroll
+                }, 5000); // 5 seconds
+            });
+        });
+
+        // Function to hide payment page and show home page
+        function hidePaymentPage() {
+            paymentPage.classList.add('hidden'); // Hide payment page
+            homePage.classList.remove('hidden'); // Show home page
+            // Scroll back to the top of the home page for a clean return
+            document.getElementById('home').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Function for "KONFIRMASI PEMBAYARAN" button
+        function confirmPayment() {
+            const contactInput = document.getElementById('contact-input').value;
+            const telegramOption = document.getElementById('telegram-option').checked;
+
+            if (contactInput.trim() === '') {
+                showModal('Input Dibutuhkan', 'Harap masukkan Nomor WhatsApp,email atau usn telegram  Anda.');
+                return;
+            }
+
+            let message = `Pembayaran Anda sedang diproses. NOKOS akan dikirim ke ${contactInput}.`;
+            if (telegramOption) {
+                message += " (Melalui Telegram)";
+            }
+            showModal('Pembayaran Berhasil!', message);
+
+            // Optionally, reset the form fields after confirmation
+            document.getElementById('contact-input').value = '';
+            document.getElementById('telegram-option').checked = false;
+
+            // In a real application, you would send this data to a backend.
+            // For this static demo, we just show a success message.
+            // You might also want to automatically redirect back to home after a delay.
+            // setTimeout(hidePaymentPage, 3000); // Example: go back to home after 3 seconds
+        }
+
+
+        // --- Dummy Testimonials Rendering ---
+        const testimonialContainer = document.getElementById('testimonial-container');
+
+        function renderTestimonials() {
+            testimonialContainer.innerHTML = ''; // Clear existing testimonials
+            dummyTestimonials.forEach(testimonial => {
+                const starsHtml = Array(Math.floor(testimonial.rating)).fill('<i class="fas fa-star text-yellow-400"></i>').join('');
+                const halfStarHtml = (testimonial.rating % 1 !== 0) ? '<i class="fas fa-star-half-alt text-yellow-400"></i>' : '';
+                const emptyStarsHtml = Array(5 - Math.ceil(testimonial.rating)).fill('<i class="far fa-star text-gray-500"></i>').join(''); // Use far for outline star
+
+                const testimonialCard = `
+                    <div class="bg-gray-800 bg-opacity-70 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-gray-700 flex flex-col">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-blue-700 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">${testimonial.name.charAt(0)}</div>
+                            <div>
+                                <p class="font-semibold text-lg text-white">${testimonial.name}</p>
+                                <div class="text-yellow-400">
+                                    ${starsHtml}${halfStarHtml}${emptyStarsHtml}
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 text-base italic">"${testimonial.comment}"</p>
+                    </div>
+                `;
+                testimonialContainer.innerHTML += testimonialCard;
+            });
+        }
+        renderTestimonials(); // Initial render
+
+        // --- Add Review Form Logic ---
+        const reviewForm = document.getElementById('review-form');
+        const reviewMessage = document.getElementById('review-message');
+        const starLabels = document.querySelectorAll('#review-form label[for^="rating-"]');
+
+        // Handle star rating hover/click effect
+        starLabels.forEach(label => {
+            label.addEventListener('mouseover', () => {
+                let currentStarValue = parseInt(label.htmlFor.replace('rating-', ''));
+                starLabels.forEach((sLabel, index) => {
+                    if (index < currentStarValue) {
+                        sLabel.querySelector('i').classList.remove('text-gray-400', 'far');
+                        sLabel.querySelector('i').classList.add('text-yellow-400', 'fas');
+                    } else {
+                        sLabel.querySelector('i').classList.remove('text-yellow-400', 'fas');
+                        sLabel.querySelector('i').classList.add('text-gray-400', 'far');
+                    }
+                });
+            });
+
+            label.addEventListener('mouseout', () => {
+                // Reset to selected state if any
+                const selectedRating = document.querySelector('input[name="rating"]:checked');
+                if (selectedRating) {
+                    let selectedValue = parseInt(selectedRating.value);
+                    starLabels.forEach((sLabel, index) => {
+                        if (index < selectedValue) {
+                            sLabel.querySelector('i').classList.remove('text-gray-400', 'far');
+                            sLabel.querySelector('i').classList.add('text-yellow-400', 'fas');
+                        } else {
+                            sLabel.querySelector('i').classList.remove('text-yellow-400', 'fas');
+                            sLabel.querySelector('i').classList.add('text-gray-400', 'far');
+                        }
+                    });
+                } else {
+                    // If no star is selected, revert all to gray
+                    starLabels.forEach(sLabel => {
+                        sLabel.querySelector('i').classList.remove('text-yellow-400', 'fas');
+                        sLabel.querySelector('i').classList.add('text-gray-400', 'far');
+                    });
+                }
+            });
+
+            label.addEventListener('click', () => {
+                 // Trigger change event on the radio button itself
+                document.getElementById(label.htmlFor).checked = true;
+                document.getElementById(label.htmlFor).dispatchEvent(new Event('change'));
+            });
+        });
+
+        // Ensure selected stars persist on click
+        document.querySelectorAll('input[name="rating"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                let selectedValue = parseInt(radio.value);
+                starLabels.forEach((sLabel, index) => {
+                    if (index < selectedValue) {
+                        sLabel.querySelector('i').classList.remove('text-gray-400', 'far');
+                        sLabel.querySelector('i').classList.add('text-yellow-400', 'fas');
+                    } else {
+                        sLabel.querySelector('i').classList.remove('text-yellow-400', 'fas');
+                        sLabel.querySelector('i').classList.add('text-gray-400', 'far');
+                    }
+                });
+            });
+        });
+
+
+        reviewForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('reviewer-name').value;
+            const rating = document.querySelector('input[name="rating"]:checked');
+            const comment = document.getElementById('review-comment').value;
+
+            if (name.trim() && rating && comment.trim()) {
+                // In a real app, this data would be sent to a server.
+                // For this static HTML, we just show a success message.
+                reviewForm.reset();
+                // Reset star display after form reset
+                starLabels.forEach(sLabel => {
+                    sLabel.querySelector('i').classList.remove('text-yellow-400', 'fas');
+                    sLabel.querySelector('i').classList.add('text-gray-400', 'far');
+                });
+                reviewMessage.classList.remove('hidden');
+                setTimeout(() => {
+                    reviewMessage.classList.add('hidden');
+                }, 3000); // Hide message after 3 seconds
+            } else {
+                showModal('Input Dibutuhkan', 'Harap lengkapi semua kolom (nama, rating, komentar) sebelum mengirimkan ulasan.');
+            }
+        });
+
+
+        // --- Fake Realtime Transaction Ticker Logic ---
+        const tickerTextElement = document.getElementById('ticker-text');
+        let currentTransactionIndex = 0;
+
+        function updateTicker() {
+            const transaction = dummyTransactions[currentTransactionIndex];
+            tickerTextElement.textContent = `${transaction.name} membeli ${transaction.product} — Terima kasih sudah membeli!`;
+            currentTransactionIndex = (currentTransactionIndex + 1) % dummyTransactions.length; // Cycle through transactions
+        }
+
+        let tickerInterval;
+        function startFakeTransactionTicker() {
+            updateTicker(); // Show first transaction immediately
+            tickerInterval = setInterval(updateTicker, 3000); // Change every 3 seconds
+            document.getElementById('transaction-ticker').style.opacity = '1'; // Make it visible
+        }
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>
