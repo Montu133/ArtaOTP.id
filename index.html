@@ -312,9 +312,38 @@
         textarea:focus {
             box-shadow: 0 0 0 3px rgba(24, 90, 219, 0.5); /* Blue glow on focus */
         }
+
+        /* Mute/Unmute Button Style */
+        #mute-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 10000; /* Ensure it's above everything else */
+            background-color: rgba(24, 90, 219, 0.8);
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            transition: background-color 0.3s ease;
+        }
+        #mute-toggle:hover {
+            background-color: #2A7FFF;
+        }
     </style>
 </head>
 <body>
+    <!-- Background Music -->
+    <audio id="background-music" src="https://files.catbox.moe/7jg5p1.m4a" autoplay loop muted preload="auto"></audio>
+
+    <!-- Mute/Unmute Button -->
+    <button id="mute-toggle" aria-label="Toggle Mute">
+        <i class="fas fa-volume-mute" id="mute-icon"></i>
+    </button>
 
     <!-- Loading Screen -->
     <div id="loading-screen">
@@ -559,7 +588,7 @@
             <p class="text-sm sm:text-base lg:text-xl text-gray-300 mb-4 sm:mb-6">Scan QRIS di bawah ini untuk pembayaran:</p>
             <div class="mb-6 sm:mb-8 p-3 sm:p-4 bg-white rounded-lg block mx-auto w-full max-w-[200px] sm:max-w-[280px]"> <!-- Max width QRIS container adjusted -->
                 <!-- QRIS Image using the provided URL -->
-                <img src="https://s6.ezgif.com/tmp/ezgif-6a46ff9b10168.png" alt="[Gambar QRIS Pembayaran]" class="w-full h-auto rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/280x280/0A1931/FFFFFF?text=QRIS+TIDAK+MUAT';">
+                <img src="https://files.catbox.moe/pui7sh.PNG" alt="[Gambar QRIS Pembayaran]" class="w-full h-auto rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/280x280/0A1931/FFFFFF?text=QRIS+TIDAK+MUAT';">
             </div>
             <p class="text-sm sm:text-base lg:text-lg text-gray-300 mb-4 sm:mb-6">Setelah pembayaran, isi data kontak Anda untuk pengiriman NOKOS.</p>
 
@@ -671,6 +700,11 @@
         const modalTitle = document.getElementById('modal-title');
         const modalMessage = document.getElementById('modal-message');
 
+        // --- Music Playback Elements ---
+        const backgroundMusic = document.getElementById('background-music');
+        const muteToggle = document.getElementById('mute-toggle');
+        const muteIcon = document.getElementById('mute-icon');
+
         // --- Custom Modal Functions ---
         function showModal(title, message) {
             modalTitle.textContent = title;
@@ -684,6 +718,13 @@
 
         // --- Loading Screen Logic ---
         document.addEventListener('DOMContentLoaded', () => {
+            // Attempt to play music muted when content loads
+            backgroundMusic.play().catch(error => {
+                console.log("Autoplay muted failed, user interaction may be needed:", error);
+                // Optionally, show a message to the user that music is available
+                // showModal("Musik Latar", "Klik ikon speaker untuk menyalakan musik latar!");
+            });
+
             setTimeout(() => {
                 loadingScreen.style.opacity = '0'; // Fade out
                 setTimeout(() => {
@@ -693,6 +734,19 @@
                     startFakeTransactionTicker(); // Start transaction ticker after main content loads
                 }, 1000); // Wait for 1 second transition
             }, 2000); // Display loading screen for 2 seconds
+        });
+
+        // --- Mute/Unmute Toggle Logic ---
+        muteToggle.addEventListener('click', () => {
+            if (backgroundMusic.muted) {
+                backgroundMusic.muted = false;
+                muteIcon.classList.remove('fa-volume-mute');
+                muteIcon.classList.add('fa-volume-up');
+            } else {
+                backgroundMusic.muted = true;
+                muteIcon.classList.remove('fa-volume-up');
+                muteIcon.classList.add('fa-volume-mute');
+            }
         });
 
         // --- Product Purchase Logic ---
